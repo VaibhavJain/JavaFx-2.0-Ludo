@@ -6,8 +6,6 @@ import java.util.Iterator;
 
 import javafx.animation.PathTransition;
 import javafx.animation.PathTransitionBuilder;
-import javafx.animation.ScaleTransition;
-import javafx.animation.ScaleTransitionBuilder;
 import javafx.application.Application;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
@@ -24,7 +22,6 @@ import javafx.scene.control.LabelBuilder;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.ImageViewBuilder;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
