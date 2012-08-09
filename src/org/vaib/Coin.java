@@ -152,18 +152,18 @@ public class Coin extends Circle {
 		int movesReamaning = move;
 		switch (region.axics()) {
 		case 1:
-			movesReamaning = movesReamaning + this.getBlockNo().getX();
+			movesReamaning = movesReamaning + this.getBlockNo().getX() - region.getMinX()  + 1;
 			break;
 		case 2:
-			movesReamaning = movesReamaning + this.getBlockNo().getY();
+			movesReamaning = movesReamaning + this.getBlockNo().getY()  - region.getMinY() + 1;
 			break;
 		case 3:
 			movesReamaning = region.getMinX() - this.getBlockNo().getX()
-					+ movesReamaning;
+					+ movesReamaning + 1;
 			break;
 		case 4:
 			movesReamaning = region.getMinY() - this.getBlockNo().getY()
-					+ movesReamaning;
+					+ movesReamaning + 1;
 			break;
 
 		}
@@ -206,7 +206,7 @@ public class Coin extends Circle {
 	public void moveToNextRegion(int currentRegion, int movesRemaing) {
 		System.out.println("Coin.moveToNextRegion() currentRegion"
 				+ currentRegion + " movesRemaing " + movesRemaing);
-		LudoRegion region = LudoRegion.values()[(currentRegion - 1) % 11];
+		LudoRegion region = LudoRegion.values()[(currentRegion - 1) % 12];
 		int x = region.getMaxX() == 100 ? region.getMinX() : region.getMaxX(), y = region
 				.getMaxY() == 100 ? region.getMinY() : region.getMaxY(), blockX = 0, blockY = 0;
 		System.out.println("region.maxCount() " + region.maxCount()
@@ -221,29 +221,29 @@ public class Coin extends Circle {
 			case 1:
 				// PositveX
 				System.out.println("PositveX");
-				blockX = region.getMinX() + movesRemaing;
+				blockX = region.getMinX() + movesRemaing - 1;
 				blockY = region.getMaxY();
-				x = (int) ((region.getMinX() + movesRemaing) * xWidth + radius);
-				y = (int) (region.getMaxY() * yHeight + radius);
+				x = (int) (blockX * xWidth + radius);
+				y = (int) (blockY * yHeight + radius);
 
 				break;
 			case 2:
 				// PositiveY
 				blockX = region.getMinX();
-				blockY = region.getMinY() + movesRemaing;
+				blockY = region.getMinY() + movesRemaing - 1;
 				x = (int) (blockX * xWidth + radius);
 				y = (int) (blockY * yHeight + radius);
 				break;
 			case 3:
 				// negtiveX
-				blockX = region.getMinX() - movesRemaing;
+				blockX = region.getMinX() - movesRemaing + 1;
 				blockY = region.getMaxY();
 				x = (int) (blockX * xWidth + radius);
 				y = (int) (blockY * yHeight + radius);
 				break;
 			case 4:
 				blockX = region.getMinX();
-				blockY = region.getMinY() - movesRemaing;
+				blockY = region.getMinY() - movesRemaing + 1;
 				x = (int) (blockX * xWidth + radius);
 				y = (int) (blockY * yHeight + radius);
 				break;
@@ -256,19 +256,9 @@ public class Coin extends Circle {
 			this.setBlockNo(new Cordenate(blockX, blockY));
 			// return cordenate;
 		} else {
-			if (region.maxCount() < 2) {
 				path.getElements().add(
 						new LineTo(region.getMaxX() * xWidth + radius, region
 								.getMaxY() * yHeight + radius));
-			} else {
-				/*
-				 * switch (region.axics()) { case 1: x = region.getMaxX() + 1;
-				 * break; case 2: y = region.getMaxY() + 1; break; }
-				 */
-				path.getElements().add(
-						new LineTo(region.getMaxX() * xWidth + radius, region
-								.getMaxY() * yHeight + radius));
-			}
 
 			this.setBlockNo(new Cordenate(x, y));
 			movesRemaing -= region.maxCount();

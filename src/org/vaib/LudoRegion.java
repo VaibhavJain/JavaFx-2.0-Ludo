@@ -1,8 +1,8 @@
 package org.vaib;
 
 public enum LudoRegion {
-	R1(0, 6, 5, 6), R2(6, 6, 6, 0), R3(7, 1, 7, 1), R4(8, 0, 8, 5), R5(9,
-			6, 14, 6), R6(14, 7, 14, 7), R7(15, 8, 9, 8), R8(8, 9, 8, 14), R9(
+	R1(0, 6, 5, 6), R2(6, 5, 6, 0), R3(7, 1, 7, 1), R4(8, 0, 8, 5), R5(9,
+			6, 14, 6), R6(14, 7, 14, 7), R7(14, 8, 9, 8), R8(8, 9, 8, 14), R9(
 			7, 14, 7, 14), R10(6, 14, 6, 9), R11(5, 8, 0, 8), R12(0, 7, 0,
 			7);
 
@@ -38,7 +38,7 @@ public enum LudoRegion {
 		if (maxX == minX && maxY == minY) {
 			return 1;
 		}
-		return 5;
+		return 6;
 	}
 
 	public int axics() {
@@ -46,6 +46,12 @@ public enum LudoRegion {
 		if (minY == maxY) {
 			if (minX < maxX) {
 				ret = Axcis.POSITIVEX.getAxcisCode();
+			}if (minX == maxX) {
+				if(minX == 0) ret = Axcis.NEGITIVEY.getAxcisCode();
+				if(minY == 0) ret = Axcis.POSITIVEX.getAxcisCode();
+				if(minX == 14) ret = Axcis.POSITIVEY.getAxcisCode();
+				if(minY == 14) ret = Axcis.NEGITIVEX.getAxcisCode();
+				
 			} else {
 				ret = Axcis.NEGITIVEX.getAxcisCode();
 			}
