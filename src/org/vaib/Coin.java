@@ -30,7 +30,7 @@ public class Coin extends Circle {
 	public static final double radius = xWidth / 2;
 	private Color color;
 	private Cordenate blockNo;
-	private int move; 
+	private int move;
 	private Path path;
 	public static Path undoPath;
 	private double startX;
@@ -123,8 +123,8 @@ public class Coin extends Circle {
 
 		this.setBlockNo(pathCoordinates[i]);
 
-		//startX = this.getCenterX();
-		//startY = this.getCenterY();
+		// startX = this.getCenterX();
+		// startY = this.getCenterY();
 		SpriteMap.updateSprite(pathCoordinates[i], this);
 	}
 
@@ -136,38 +136,108 @@ public class Coin extends Circle {
 		return builder.toString();
 	}
 
+	public void moveOnFinalPath(int moveRemaning) {
+		System.out.println("Coin.moveOnFinalPath() " + this);
+		LudoRegion region = LudoRegion.values()[this.getBlockNo().getRegion() - 1];
+		System.out.println(this.getBlockNo().getRegion() + " Coin.moveOnFinalPath() region " + region); 
+		if(moveRemaning > 6){
+		//invalid move
+			return;
+		}
+		int x = 0 , y = 0;
+		switch (this.getBlockNo().getRegion()) {
+		case 12:
+			x = region.getMinX() + moveRemaning;
+			y = region.getMaxY();
+			break;
+		case 3:
+			x = region.getMinX();
+			y = region.getMinY() + moveRemaning;
+			break;
+		case 6:
+			x = region.getMinX() - moveRemaning;
+			y = region.getMinY();
+			break;
+		case 9:
+			x = region.getMinX();
+			y = region.getMinY() - moveRemaning;
+		}
+		System.out.println("movesReamaning " + moveRemaning);
+		path.getElements().add(
+				new LineTo(x * xWidth + radius, y * yHeight + radius));
+		this.setBlockNo(new Cordenate(x, y));
+	}
+
+	public boolean onFinalPath() {
+		if (this.getBlockNo().getRegion() > 12)
+			return true;
+		return false;
+	}
+
+	public boolean validMoves(int currentRegion) {
+		System.out.println("Coin.validMoves() currentRegion " + currentRegion);
+		int finalRegion = 0;
+		switch (currentRegion) {
+		case 3:
+			finalRegion = 14;
+			break;
+		case 6:
+			finalRegion = 15;
+			break;
+		case 9:
+			finalRegion = 16;
+			break;
+		case 12:
+			finalRegion = 13;
+			break;
+		}
+		// System.out.println("this.color " + this.color +
+		// "LudoRegion.values()[finalRegion - 1].getPaint() " +
+		// LudoRegion.values()[finalRegion - 1].getPaint());
+		if (this.color == LudoRegion.values()[finalRegion - 1].getPaint()) {
+			System.out.println("ret true");
+			return true;
+		}
+		return false;
+	}
+
 	public void transformMove() {
 		System.out.println("Coin.transformMove()" + this);
 		lastMovedCoin = this;
+		LudoRegion region = null;
 		path = new Path();
 		// if region 4 than
-		Cordenate from = new Cordenate(this.getBlockNo().getX(),
-				this.getBlockNo().getY());
+		Cordenate from = new Cordenate(this.getBlockNo().getX(), this
+				.getBlockNo().getY());
 		MoveTo to = new MoveTo(this.getCenterX(), this.getCenterY());
 		path.getElements().add(to);
+		if (onFinalPath()) {
+			moveOnFinalPath(move);
+		} else {
+			region = LudoRegion.values()[(this.getBlockNo().getRegion() - 1) % 11];
 
-		LudoRegion region = null;
-		region = LudoRegion.values()[(this.getBlockNo().getRegion() - 1) % 11];
+			int movesReamaning = move;
+			switch (region.axics()) {
+			case 1:
+				movesReamaning = movesReamaning + this.getBlockNo().getX()
+						- region.getMinX() + 1;
+				break;
+			case 2:
+				movesReamaning = movesReamaning + this.getBlockNo().getY()
+						- region.getMinY() + 1;
+				break;
+			case 3:
+				movesReamaning = region.getMinX() - this.getBlockNo().getX()
+						+ movesReamaning + 1;
+				break;
+			case 4:
+				movesReamaning = region.getMinY() - this.getBlockNo().getY()
+						+ movesReamaning + 1;
+				break;
 
-		int movesReamaning = move;
-		switch (region.axics()) {
-		case 1:
-			movesReamaning = movesReamaning + this.getBlockNo().getX() - region.getMinX()  + 1;
-			break;
-		case 2:
-			movesReamaning = movesReamaning + this.getBlockNo().getY()  - region.getMinY() + 1;
-			break;
-		case 3:
-			movesReamaning = region.getMinX() - this.getBlockNo().getX()
-					+ movesReamaning + 1;
-			break;
-		case 4:
-			movesReamaning = region.getMinY() - this.getBlockNo().getY()
-					+ movesReamaning + 1;
-			break;
-
+			}
+			moveToNextRegion(this.getBlockNo().getRegion(), movesReamaning);
 		}
-		moveToNextRegion(this.getBlockNo().getRegion(), movesReamaning);
 
 		synchronized (path) {
 			PathTransition transition = PathTransitionBuilder.create()
@@ -206,67 +276,82 @@ public class Coin extends Circle {
 	public void moveToNextRegion(int currentRegion, int movesRemaing) {
 		System.out.println("Coin.moveToNextRegion() currentRegion"
 				+ currentRegion + " movesRemaing " + movesRemaing);
-		LudoRegion region = LudoRegion.values()[(currentRegion - 1) % 12];
-		int x = region.getMaxX() == 100 ? region.getMinX() : region.getMaxX(), y = region
-				.getMaxY() == 100 ? region.getMinY() : region.getMaxY(), blockX = 0, blockY = 0;
-		System.out.println("region.maxCount() " + region.maxCount()
-				+ " region.axics() " + region.axics());
+		// Check for final
+		
+			LudoRegion region = LudoRegion.values()[(currentRegion - 1) % 12];
+			int x = region.getMaxX() == 100 ? region.getMinX() : region
+					.getMaxX(), y = region.getMaxY() == 100 ? region.getMinY()
+					: region.getMaxY(), blockX = 0, blockY = 0;
+			System.out.println("region.maxCount() " + region.maxCount()
+					+ " region.axics() " + region.axics());
+			// int maxCount = region.maxCount();
 
-		// int maxCount = region.maxCount();
+			System.out.println("region " + region);
 
-		System.out.println("region " + region);
+			if (region.maxCount() > movesRemaing) {
+				switch (region.axics()) {
+				case 1:
+					// PositveX
+					System.out.println("PositveX");
+					blockX = region.getMinX() + movesRemaing - 1;
+					blockY = region.getMaxY();
+					x = (int) (blockX * xWidth + radius);
+					y = (int) (blockY * yHeight + radius);
 
-		if (region.maxCount() > movesRemaing) {
-			switch (region.axics()) {
-			case 1:
-				// PositveX
-				System.out.println("PositveX");
-				blockX = region.getMinX() + movesRemaing - 1;
-				blockY = region.getMaxY();
-				x = (int) (blockX * xWidth + radius);
-				y = (int) (blockY * yHeight + radius);
-
-				break;
-			case 2:
-				// PositiveY
-				blockX = region.getMinX();
-				blockY = region.getMinY() + movesRemaing - 1;
-				x = (int) (blockX * xWidth + radius);
-				y = (int) (blockY * yHeight + radius);
-				break;
-			case 3:
-				// negtiveX
-				blockX = region.getMinX() - movesRemaing + 1;
-				blockY = region.getMaxY();
-				x = (int) (blockX * xWidth + radius);
-				y = (int) (blockY * yHeight + radius);
-				break;
-			case 4:
-				blockX = region.getMinX();
-				blockY = region.getMinY() - movesRemaing + 1;
-				x = (int) (blockX * xWidth + radius);
-				y = (int) (blockY * yHeight + radius);
-				break;
-			default:
-				break;
-			}
-			path.getElements().add(new LineTo(x, y));
-			System.out.println("from if  blockX " + blockX + " blockY "
-					+ blockY);
-			this.setBlockNo(new Cordenate(blockX, blockY));
-			// return cordenate;
-		} else {
+					break;
+				case 2:
+					// PositiveY
+					blockX = region.getMinX();
+					blockY = region.getMinY() + movesRemaing - 1;
+					x = (int) (blockX * xWidth + radius);
+					y = (int) (blockY * yHeight + radius);
+					break;
+				case 3:
+					// negtiveX
+					blockX = region.getMinX() - movesRemaing + 1;
+					blockY = region.getMaxY();
+					x = (int) (blockX * xWidth + radius);
+					y = (int) (blockY * yHeight + radius);
+					break;
+				case 4:
+					blockX = region.getMinX();
+					blockY = region.getMinY() - movesRemaing + 1;
+					x = (int) (blockX * xWidth + radius);
+					y = (int) (blockY * yHeight + radius);
+					break;
+				default:
+					break;
+				}
+				path.getElements().add(new LineTo(x, y));
+				System.out.println("from if  blockX " + blockX + " blockY "
+						+ blockY);
+				this.setBlockNo(new Cordenate(blockX, blockY));
+				// return cordenate;
+			} else {
 				path.getElements().add(
 						new LineTo(region.getMaxX() * xWidth + radius, region
 								.getMaxY() * yHeight + radius));
 
-			this.setBlockNo(new Cordenate(x, y));
-			movesRemaing -= region.maxCount();
-			System.out.println("from final blockX " + x + " blockY " + y
-					+ " movesRemaing " + movesRemaing);
-			if (movesRemaing != 0)
-				moveToNextRegion(currentRegion + 1, movesRemaing);
-		}
+				this.setBlockNo(new Cordenate(x, y));
+				movesRemaing -= region.maxCount();
+				System.out.println("from final blockX " + x + " blockY " + y
+						+ " movesRemaing " + movesRemaing);
+				if (movesRemaing != 0){
+					boolean finalFlag = false;
+					switch (currentRegion) {
+					case 12:
+					case 3:
+					case 6:
+					case 9:
+						finalFlag = validMoves(currentRegion);
+					}
+					if (finalFlag) {
+						moveOnFinalPath(movesRemaing);
+					} else{
+					moveToNextRegion(currentRegion + 1, movesRemaing);
+					}
+				}
+			}
 		// return cordenate;
 	}
 

@@ -35,6 +35,8 @@ import javafx.scene.shape.LineBuilder;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.PolygonBuilder;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.RectangleBuilder;
 import javafx.scene.shape.StrokeLineJoin;
@@ -70,9 +72,10 @@ public class LudoMain extends Application {
 	public static double xWidth = Math.ceil(screenX / 15);
 	public static double yHeight = Math.ceil(screenY / 15);
 
-	public static void unDoMove(){
+	public static void unDoMove() {
 		lastMovedCoin.undoMove();
 	}
+
 	@Override
 	public void start(final Stage primaryStage) {
 
@@ -105,7 +108,7 @@ public class LudoMain extends Application {
 		root.getChildren().addAll(this.centerRectangle(xWidth, yHeight));
 
 		master.getChildren().addAll(root);
-		
+
 		master.getChildren().add(Dice.getInstance().getDice());
 
 		/*
@@ -185,13 +188,15 @@ public class LudoMain extends Application {
 
 		// allow the dialog to be dragged around.
 		final Node rootDialog = dialog.getScene().getRoot();
-		final SimpleCordinate dragDelta = new SimpleCordinate(0,0);
+		final SimpleCordinate dragDelta = new SimpleCordinate(0, 0);
 		rootDialog.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
 				// record a delta distance for the drag and drop operation.
-				dragDelta.x = (new Double(dialog.getX() - mouseEvent.getScreenX())).intValue();
-				dragDelta.y = (new Double(dialog.getY() - mouseEvent.getScreenY())).intValue();
+				dragDelta.x = (new Double(dialog.getX()
+						- mouseEvent.getScreenX())).intValue();
+				dragDelta.y = (new Double(dialog.getY()
+						- mouseEvent.getScreenY())).intValue();
 			}
 		});
 		rootDialog.setOnMouseDragged(new EventHandler<MouseEvent>() {
@@ -226,9 +231,8 @@ public class LudoMain extends Application {
 				coin.setCenterY(y);
 				coin.setBlockNo(new Cordenate(100, 100));
 
-				
 				group.getChildren().add(coin);
-				
+
 				coin.setStartX(x);
 				coin.setStartY(y);
 			}
@@ -383,11 +387,38 @@ public class LudoMain extends Application {
 
 	public Group centerRectangle(double xWidth, double yHeight) {
 		Group centerRectangle = new Group();
-		// centerRectangle.setBlendMode(BlendMode.OVERLAY);
 		Rectangle rectangleCenter = RectangleBuilder.create().x(6 * xWidth)
 				.y(6 * yHeight).height(3 * yHeight).width(3 * xWidth)
-				.fill(Color.BLUEVIOLET).build();
+				.fill(Color.WHITE).build();
 		centerRectangle.getChildren().add(rectangleCenter);
+		double x1 = 6 * xWidth, y1 = 6 * yHeight, cx = x1 + 1.5 * xWidth, cy = y1
+				+ 1.5 * yHeight;
+
+		Polygon t1 = PolygonBuilder.create()
+				.points(x1, y1, x1 + 3 * xWidth, y1, cx, cy).fill(Color.YELLOW)
+				.stroke(Color.BLACK).strokeWidth(2.0f).build();
+
+		Polygon t2 = PolygonBuilder
+				.create()
+				.points(x1, y1 + 3 * xWidth, x1 + 3 * xWidth, y1 + 3 * xWidth,
+						cx, cy).fill(Color.RED).stroke(Color.BLACK)
+				.strokeWidth(2.0f).build();
+
+		Polygon t3 = PolygonBuilder
+				.create()
+				.points(x1 + 3 * xWidth, y1 + 3 * xWidth, x1 + 3 * xWidth, y1,
+						cx, cy).fill(Color.BLUE).stroke(Color.BLACK)
+				.strokeWidth(2.0f).build();
+
+		Polygon t4 = PolygonBuilder.create()
+				.points(x1, y1, x1, y1 + 3 * xWidth, cx, cy).fill(Color.GREEN)
+				.stroke(Color.BLACK).strokeWidth(2.0f).build();
+
+		centerRectangle.getChildren().add(t1);
+		centerRectangle.getChildren().add(t2);
+		centerRectangle.getChildren().add(t3);
+		centerRectangle.getChildren().add(t4);
+
 		return centerRectangle;
 	}
 

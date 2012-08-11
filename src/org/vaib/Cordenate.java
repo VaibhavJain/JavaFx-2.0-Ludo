@@ -50,14 +50,26 @@ public class Cordenate {
 			} else {
 				region = 7;
 			}
-		} else if (y == 7 && x == 0) {
-			region = 12;
-		} else if (y == 0 && x == 7) {
-			region = 3;
-		} else if (y == 7 && x == 14) {
-			region = 6;
-		} else if (y == 14 && x == 7) {
-			region = 9;
+		} else if (y == 7) {
+			if (x == 0) {
+				region = 12;
+			} else if (x > 0 && x < 7) {
+				region = 13;
+			} else if (x == 14) {
+				region = 6;
+			} else if (x < 14 && x > 7) {
+				region = 15;
+			}
+		} else if (x == 7) {
+			if (y == 0) {
+				region = 3;
+			} else if (y > 0 && y < 7) {
+				region = 14;
+			} else if (y == 14) {
+				region = 9;
+			} else if (y < 14 && y > 7) {
+				region = 16;
+			}
 		}
 	}
 
@@ -107,8 +119,9 @@ public class Cordenate {
 				.append(" | width : ").append(width).append(" | height : ")
 				.append(height).toString();
 	}
-	public boolean equals(Cordenate cordenate){
-		if(this.x == cordenate.getX()  &&  this.x == cordenate.getY()){
+
+	public boolean equals(Cordenate cordenate) {
+		if (this.x == cordenate.getX() && this.x == cordenate.getY()) {
 			return true;
 		}
 		return false;
