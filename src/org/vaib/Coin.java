@@ -30,7 +30,7 @@ public class Coin extends Circle {
 	public static final double radius = xWidth / 2;
 	private Color color;
 	private Cordenate blockNo;
-	private int move;
+	private int move; 
 	private Path path;
 	public static Path undoPath;
 	private double startX;
