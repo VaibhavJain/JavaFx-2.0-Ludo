@@ -73,6 +73,7 @@ public class Coin extends Circle {
 		System.out.println("colorCode.getRed() == 1.0"
 				+ (colorCode.getRed() == 1.0));
 		int value = 128;
+		// just checking
 		if (colorCode.getRed() > 0 && colorCode.getGreen() > 0) {
 			color = "YELLOW";
 		} else if ((int) Math.floor(colorCode.getBlue() * 255) == value
